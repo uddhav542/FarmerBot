@@ -2,17 +2,13 @@ from NLP import *
 from crop_pred import *
 from rain_pred import *
 
-
-
-
-
-
 from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 from tkinter import *
 import tkinter as tk
 import requests
 import time
+import numpy as np
 
 bot = ChatBot("my bot")
 
@@ -35,33 +31,73 @@ trainer.train(conv)
 
 
 main = Tk()
-main.geometry("500x650")
+main.geometry("800x600")
 main.title("AgriBot")
+img = PhotoImage(file="farm.png")
 
+photoL = Label(main, image=img)
+
+photoL.pack(pady=5)
+
+def search(list, platform):
+    for i in range(len(list)):
+        if list[i] == platform:
+            return True
+    return False
 
 def ask_from_bot():
     query = textF.get()
 
-    if query[0:2] != "./":
-        msgs.insert(END, "you: " + query)
-        state, district, subdivison, crop, year, month, rainfall, crp = NLP_main(query)
+    if query== "":
+        msgs.insert(END , "You:    " + query)
+        msgs.insert(END, "AgriBot:    " + "Please Enter Something!!")
+
+    elif query[0:2] != "./":
+        msgs.insert(END,"You:    " + query)
+        state, district, subdivison, crop, year, month, rainfall, crp , new_state_word , IsK= NLP_main(query)
         if (crop != None and rainfall):
             a, b= crop_prediction(crop.capitalize())
-            msgs.insert(END, "bot: " + "Required Rainfall " + str(a))
-            msgs.insert(END, "bot: " + "Suitable States "+str(b))
+            msgs.insert(END, "AgriBot:    " + "Required Rainfall " + str(a))
+            splits = np.array_split(b, 3)
+            msgs.insert(END, "AgriBot:    " + "Suitable States "+ str(splits[0]), str(splits[1]), str(splits[2]))
 
         elif (rainfall != None and month != None and subdivison):
-            msgs.insert(END, "bot: " + str(rain_prediction(subdivison.upper(), month[0:3].upper())))
+            msgs.insert(END, "AgriBot:    " + str(rain_prediction(subdivison.upper(), month[0:3].upper())))
+
+        elif (state and crp and IsK):
+            c, d = state_prediction(state.capitalize())
+            flag = 0
+            if crop.capitalize() in d:
+                flag = 1
+            else:
+                flag = 0
+
+            if flag==1:
+                msgs.insert(END, "AgriBot:    " + " Yes!!. It is grown in " + state)
+            else:
+                msgs.insert(END, "AgriBot:    " + " No. It is not grown in " + state)
+
+
         elif (state and crp):
             c, d = state_prediction(state.capitalize())
-            msgs.insert(END, "bot: " + "Crops "+str(d))
-            msgs.insert(END, "bot: " + "Average Rainfall of this state " + str(c))
+            splits = np.array_split(d, 3)
+            msgs.insert(END, "AgriBot:    " + "Crops " + str(splits[0]), str(splits[1]), str(splits[2]))
+            msgs.insert(END, "AgriBot:    " + "Average Rainfall - " + str(c))
+
+
+
+        elif (new_state_word!=None and crp):
+            c, d = crop_prediction(crop.capitalize())
+            splits = np.array_split(d, 3)
+            msgs.insert(END, "AgriBot:    " + "Suitable States " + str(splits[0]), str(splits[1]), str(splits[2]))
+
+
         elif (state and rainfall):
             e, f = state_prediction(state.capitalize())
-            msgs.insert(END, "bot: " + "Average Rainfall of this state " + str(e))
+            msgs.insert(END, "AgriBot:    " + "Average Rainfall of this state " + str(e))
 
         else:
-            msgs.insert(END, "bot: " + "Sorry. I didn't get you. Please try to ask something relevant.")
+            msgs.insert(END, "AgriBot:    " + "Sorry. I didn't get you. Please try to ask something relevant.")
         #answer_from_bot = bot.get_response(query)
 
 
@@ -90,8 +126,8 @@ def ask_from_bot():
         final_data3 =  "Sunrise: " + sunrise + "          " + "Sunset: " + sunset
 
 
-        msgs.insert(END, "you: " + query)
-        msgs.insert(END, "bot: " + str(final_info) , str(final_data1), str(final_data2), str(final_data3))
+        msgs.insert(END,"\n"+"You:    " + query)
+        msgs.insert(END, "AgriBot:    " + str(final_info) , str(final_data1), str(final_data2), str(final_data3))
         textF.delete(0, END)
         #
     else:
@@ -100,14 +136,22 @@ def ask_from_bot():
 
 frame = Frame(main)
 sc = Scrollbar(frame)
-msgs = Listbox(frame, width=80, height=20)
+msgs = Listbox(frame, width=150, height=15,yscrollcommand = sc.set, fg='#095ea0')
 sc.pack(side=RIGHT, fill=Y)
-msgs.pack(side=LEFT, fill=BOTH, pady=10)
-frame.pack()
 
-textF = Entry(main, font=("Times New Roman", 18))
+msgs.pack(side=LEFT, fill=BOTH, pady=10)
+frame.config(bg='white')
+frame.pack()
+sc.config( command = msgs.yview )
+
+textF = Entry(main, font=("Times New Roman", 16))
 textF.pack(fill=X, pady=10)
 
-btn = Button(main, text="Ask", font=("Times New Roman", 18), command=ask_from_bot)
-btn.pack()
+btn = Button(main, text="SUBMIT", font=("Times New Roman", 16), command=ask_from_bot,bg='#d890f5',
+                activebackground='white')
+#btn.pack()
+btn.pack(pady=20)
+
+label = Label(main, text = "Please Enter ./cityname for live weather", height = 1, width =40 , font=12)
+label.pack()
 main.mainloop()

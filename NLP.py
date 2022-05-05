@@ -224,7 +224,15 @@ def NLP_main(user_input):
            'rainfall','rain'
        ]
        cr = [
-           'crop','CROP','crops','CuROPS'
+           'crop','CROP','crops','CROPS'
+       ]
+
+       state_present = [
+           'states','States','STATES','state','State','STATE'
+       ]
+
+       is_present = [
+           'is','Is','IS','iS'
        ]
 
        def intersection_s(sent):  # prints the state from the given input
@@ -274,6 +282,18 @@ def NLP_main(user_input):
                    # print("Crop : ", value)
                    return value
 
+       def state_word_present(sent):
+           for value in sent:
+               if value in state_present:
+                   # print("Crop : ", value)
+                   return value
+
+       def Is_word_present(sent):
+           for value in sent:
+               if value in is_present:
+                   # print("Crop : ", value)
+                   return value
+
        def crp_word(sent):
            for value in sent:
                if value in cr:
@@ -301,6 +321,6 @@ def NLP_main(user_input):
        month = intersection_month(sentence)
        rainf = rainfall_word(sentence)
        crp = crp_word(sentence)
-       return st,ds,subD,crop,year,month,rainf,crp
-
-
+       st_word = state_word_present(sentence)
+       iskey = Is_word_present(sentence)
+       return st,ds,subD,crop,year,month,rainf,crp, st_word, iskey

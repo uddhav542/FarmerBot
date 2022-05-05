@@ -123,5 +123,3 @@ def state_prediction(statename):
     crop_available = np.array(crop_available)
     print("Crops that taken in this State:", crop_available)
     return df['Rainfall'].mean(), crop_available
-
-
