@@ -117,7 +117,7 @@ def state_prediction(statename):
 
     required_data = crop_data_alpha[crop_data_alpha['State'] == statename]
     df = required_data[(required_data.Crop_Year > 2005)]
-    print("Average Rainfall of this State:", df['Rainfall'].mean())
+    print("Average Rainfall of the State:", df['Rainfall'].mean())
     ds = df['Crop']
     crop_available = ds.drop_duplicates()
     crop_available = np.array(crop_available)

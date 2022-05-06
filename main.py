@@ -6,6 +6,7 @@ from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 from tkinter import *
 import tkinter as tk
+import tkinterpp
 import requests
 import time
 import numpy as np
@@ -39,6 +40,8 @@ photoL = Label(main, image=img)
 
 photoL.pack(pady=5)
 
+label = Label(main, text = "Ask your queries", height = 1, width =40 , font=12)
+label.pack(pady=5)
 def search(list, platform):
     for i in range(len(list)):
         if list[i] == platform:
@@ -61,7 +64,7 @@ def ask_from_bot():
             splits = np.array_split(b, 3)
             msgs.insert(END, "AgriBot:    " + "Suitable States "+ str(splits[0]), str(splits[1]), str(splits[2]))
 
-        elif (rainfall != None and month != None and subdivison):
+        elif (rainfall != None and month != None and (subdivison or state)):
             msgs.insert(END, "AgriBot:    " + str(rain_prediction(subdivison.upper(), month[0:3].upper())))
 
         elif (state and crp and IsK):
@@ -136,7 +139,7 @@ def ask_from_bot():
 
 frame = Frame(main)
 sc = Scrollbar(frame)
-msgs = Listbox(frame, width=150, height=15,yscrollcommand = sc.set, fg='#095ea0')
+msgs = Listbox(frame, width=150, height=15,yscrollcommand = sc.set, fg='#1e6de5')
 sc.pack(side=RIGHT, fill=Y)
 
 msgs.pack(side=LEFT, fill=BOTH, pady=10)
@@ -144,14 +147,15 @@ frame.config(bg='white')
 frame.pack()
 sc.config( command = msgs.yview )
 
-textF = Entry(main, font=("Times New Roman", 16))
+textF = tkinterpp.EntryWithPlaceholder(main,placeholder="Type here", font=("Times New Roman", 16))
 textF.pack(fill=X, pady=10)
 
-btn = Button(main, text="SUBMIT", font=("Times New Roman", 16), command=ask_from_bot,bg='#d890f5',
+btn = Button(main, text="SUBMIT", font=("Times New Roman", 16), command=ask_from_bot,bg='#b508b8',fg = "white",
                 activebackground='white')
 #btn.pack()
 btn.pack(pady=20)
 
 label = Label(main, text = "Please Enter ./cityname for live weather", height = 1, width =40 , font=12)
 label.pack()
+main.configure(bg='#f84bfa')
 main.mainloop()
