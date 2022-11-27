@@ -117,9 +117,25 @@ def rain_prediction(var, var1):
     clf1.fit(X_train, y_train)
     pred1 = clf1.predict(X_subdata1)
 
-    # print("Average Rainfall (Random Forest) of ",var11," For ",var1," is ", pred1[6]," mm")
+    from sklearn.svm import SVC
+    classifier = SVC(kernel='rbf', random_state = 1)
+    classifier.fit(X_train,y_train)
 
-    print("Rainfall of ", var, " is ", (pred[0] + pred1[0]) / 2)
-    return (pred[0] + pred1[0]) / 2
+    pred2 = classifier.predict(X_subdata1)
+    
+    from sklearn.linear_model import LogisticRegression
+    classifier = LogisticRegression(random_state=0, max_iter=100)
+    classifier.fit(X_train,y_train)
+    pred3 = classifier.predict(X_subdata1)
+
+    from sklearn.naive_bayes import GaussianNB
+    gnb = GaussianNB().fit(X_train, y_train)
+    pred4 = gnb.predict(X_subdata1)
+
+    # print("Average Rainfall (Random Forest) of ",var11," For ",var1," is ", pred1[6]," mm")
+    ans = (pred[0] + pred1[0] + pred2[0] + pred3[0] + pred4[0]) / 5
+    print("Rainfall of ", var, " is ", ans)
+    
+    return ans 
     # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
