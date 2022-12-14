@@ -1,3 +1,8 @@
+
+
+import textwrap
+from datetime import datetime
+
 from NLP import *
 from crop_pred import *
 from rain_pred import *
@@ -30,18 +35,54 @@ conv = [
 trainer = ListTrainer(bot)
 trainer.train(conv)
 
+root = Tk()
+root.config(bg="#7dcfb6")
+root.geometry('410x600+400+100')
 
-main = Tk()
-main.geometry("800x600")
-main.title("AgriBot")
+
+canvas = Canvas(root, width=200, height=200,bg="white")
+canvas.grid(row=0,column=0,columnspan=2)
+canvas.place(x=10, y=10, width=390, height=530)
+
+root.resizable(False, False)
+
 img = PhotoImage(file="farm.png")
 
-photoL = Label(main, image=img)
+root.iconphoto(False, img)
+root.title("AgroBot")
 
-photoL.pack(pady=5)
+# photoL = Label(root, image=img)
+#
+# photoL.pack(pady=5)
 
-label = Label(main, text = "Ask your queries", height = 1, width =40 , font=12)
-label.pack(pady=5)
+# label = Label(root, text = "Ask your queries", height = 1, width =40 , font=12)
+# label.pack(pady=5)
+
+bubbles = []
+
+#class BotBubble:
+
+def botbubble(self,master,message=""):
+        self.master = master
+        self.frame = Frame(master,bg="light green")
+        self.i = self.master.create_window(70,490,window=self.frame)
+
+        Label(self.frame,text=datetime.now().strftime("%d-%m-%Y %X"),font=("times new roman", 7),bg="light green").grid(row=0,column=0,sticky="w",padx=5)
+        Label(self.frame, text=textwrap.fill(message, 25), font=("times new roman", 9),bg="light green").grid(row=1, column=0,sticky="w",padx=5,pady=3)
+        root.update_idletasks()
+        self.master.create_polygon(self.draw_triangle(self.i), fill="light green", outline="light green")
+
+
+def draw_triangle(self,widget):
+        x1, y1, x2, y2 = self.master.bbox(widget)
+        return x1, y2 - 10, x1 - 15, y2 + 10, x1, y2
+
+# def send_message():
+#     if bubbles:
+#         canvas.move(ALL, 0, -80)
+#     a = BotBubble(canvas,message=entry.get())
+#     bubbles.append(a)
+
 def search(list, platform):
     for i in range(len(list)):
         if list[i] == platform:
@@ -49,7 +90,12 @@ def search(list, platform):
     return False
 
 def ask_from_bot():
-    query = textF.get()
+    # if bubbles:
+    #     canvas.move(ALL, 0, -80)
+    #     a = BotBubble(canvas,message=entry.get())
+    #     bubbles.append(a)
+
+    query = entry.get()
 
     if query== "":
         msgs.insert(END , "You:    " + query)
@@ -106,7 +152,7 @@ def ask_from_bot():
 
         # msgs.insert(END, "bot: " + str(answer_from_bot))
 
-        textF.delete(0, END)
+        entry.delete(0, END)
     elif query[0:2] == "./":
         city = query[2:]
         api = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=06c921750b9a82d8f5d1294e1586276f"
@@ -131,31 +177,30 @@ def ask_from_bot():
 
         msgs.insert(END,"\n"+"You:    " + query)
         msgs.insert(END, "AgriBot:    " + str(final_info) , str(final_data1), str(final_data2), str(final_data3))
-        textF.delete(0, END)
+        entry.delete(0, END)
         #
     else:
         print("Wrong input")
 
-
-frame = Frame(main)
-sc = Scrollbar(frame)
-msgs = Listbox(frame, width=150, height=15,yscrollcommand = sc.set, fg='#1e6de5')
+sc = Scrollbar(root)
+msgs = Listbox(canvas, width=150, height=15,yscrollcommand = sc.set, fg='#00b2ca')
+msgs.insert(1, "AgriBot:     Ask your queries here")
 sc.pack(side=RIGHT, fill=Y)
-
 msgs.pack(side=LEFT, fill=BOTH, pady=10)
-frame.config(bg='white')
-frame.pack()
+
 sc.config( command = msgs.yview )
 
-textF = tkinterpp.EntryWithPlaceholder(main,placeholder="Type here", font=("Times New Roman", 16))
-textF.pack(fill=X, pady=10)
+entry = Entry(root,width=26, font=("FarmerBot", 10))
+entry.place(x=10, y=550, width=290, height=40)
 
-btn = Button(main, text="SUBMIT", font=("Times New Roman", 16), command=ask_from_bot,bg='#b508b8',fg = "white",
-                activebackground='white')
-#btn.pack()
-btn.pack(pady=20)
 
-label = Label(main, text = "Please Enter ./cityname for live weather", height = 1, width =40 , font=12)
+#buton
+#img = PhotoImage(file="6532019.png")
+buton = Button(root, width=8, height=2, relief='raised',state='active',command=ask_from_bot)
+buton.config(text='Send', bg='#00b2ca', font='Verdana 8 bold')
+buton.place(x=310, y=550)
+#root.wm_attributes('-transparentcolor', '')
+label = Label(root, text = "Please Enter ./cityname for live weather", height = 1, width =80,fg='blue',bg='#7dcfb6')
 label.pack()
-main.configure(bg='#f84bfa')
-main.mainloop()
+
+root.mainloop()
